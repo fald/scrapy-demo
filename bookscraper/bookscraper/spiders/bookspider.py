@@ -15,7 +15,11 @@ class BookspiderSpider(scrapy.Spider):
                 'url' : book.css("h3 a").attrib["href"]
             }
         
-        next_page = response.css("li.next").attrib['href'].get()
+        next_page = response.css("li.next a").attrib['href']
         if next_page:
-            next_url = "http://books.toscrape.com/" + next_page
+            next_url = "http://books.toscrape.com/"
+            if 'catalogue/' in next_page:
+                next_url += next_page
+            else:
+                next_url += "catalogue/" + next_page
             yield response.follow(next_url, callback=self.parse)
