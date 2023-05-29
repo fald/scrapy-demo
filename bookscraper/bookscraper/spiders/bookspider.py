@@ -14,3 +14,8 @@ class BookspiderSpider(scrapy.Spider):
                 'price' : book.css(".product_price .price_color::text").get(),
                 'url' : book.css("h3 a").attrib["href"]
             }
+        
+        next_page = response.css("li.next").attrib['href'].get()
+        if next_page:
+            next_url = "http://books.toscrape.com/" + next_page
+            yield response.follow(next_url, callback=self.parse)
