@@ -5,10 +5,10 @@ from scrapy.selector import HtmlXPathSelector
 from scrapy.http import Request
 
 # Import item that will be used to generate JSON feed
-from crawler.items import CrawlerItem
+# from crawler.items import CrawlerItem
 
 # Import helper functions
-from crawler.helpers import *
+# from crawler.helpers import *
 
 
 
