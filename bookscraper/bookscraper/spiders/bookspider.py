@@ -25,9 +25,12 @@ class BookspiderSpider(scrapy.Spider):
         #         next_url += "catalogue/" + next_page
         #     yield response.follow(next_url, callback=self.parse)
         
-            relative_url = response.css("h3 a").attrib["href"].get()
+            relative_url = book.css("h3 a").attrib["href"].get()
             if 'catalogue/' in relative_url:
-                next_page_url = "http://books.toscrape.com/" + relative_url
+                book_url = "http://books.toscrape.com/" + relative_url
             else:
-                next_page_url = "http://books.toscrape.com/catalogue/" + relative_url
-            yield response.follow(next_page_url, callback=self.parse_book_page)
+                book_url = "http://books.toscrape.com/catalogue/" + relative_url
+            yield response.follow(book_url, callback=self.parse_book_page)
+            
+    def parse_book_page(self, response):
+        pass
