@@ -6,6 +6,8 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
+import psycopg2
+import sqlalchemy
 
 
 class BookscraperPipeline:
@@ -56,5 +58,17 @@ class BookscraperPipeline:
         }
         adapter["star_rating"] = ratings[value.split(" ")[1].lower()]
          
-        
         return item
+    
+
+class SaveToPostgresPipeline:
+    def __init__(self):
+        self.conn = psycopg2.connect(
+            host="localhost",
+            database="books",
+            user="postgres",
+            password=""
+        )
+        
+        self.cur = self.conn.cursor()
+           
