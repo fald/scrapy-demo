@@ -64,11 +64,33 @@ class BookscraperPipeline:
 class SaveToPostgresPipeline:
     def __init__(self):
         self.conn = psycopg2.connect(
-            host="localhost",
-            database="books",
-            user="postgres",
-            password=""
+            host = "localhost",
+            database = "books",
+            user = "postgres",
+            password = ""
         )
         
+        # Create cursor to execute commands
         self.cur = self.conn.cursor()
-           
+        
+        # Create book table (to go into the books db, I am a naming genius.)
+        self.cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS books (
+                id int NOT NULL SERIAL PRIMARY KEY,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                url VARCHAR(255),
+                title text,
+                product_type VARCHAR(255),
+                price DECIMAL,
+                price_excl_tax DECIMAL,
+                price_incl_tax DECIMAL,
+                tax DECIMAL,
+                availability VARCHAR(255),
+                num_reviews int,
+                star_rating int,
+                category VARCHAR(255),
+                description text,
+            );
+            """
+        )
