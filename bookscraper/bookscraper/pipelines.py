@@ -7,7 +7,6 @@
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 import psycopg2
-import sqlalchemy
 
 
 class BookscraperPipeline:
@@ -67,7 +66,7 @@ class SaveToPostgresPipeline:
             host = "localhost",
             database = "books",
             user = "postgres",
-            password = ""
+            password = "password"
         )
         
         # Create cursor to execute commands
@@ -94,7 +93,7 @@ class SaveToPostgresPipeline:
             );
             """
         )
-        
+                
     def process_item(self, item, spider):
         self.cur.execute(
             """
@@ -141,6 +140,9 @@ class SaveToPostgresPipeline:
                 item['description']
             )
         )
+        
+        self.conn.commit()
+        return item
         
     def close_spider(self, spider):
         self.cur.close()
