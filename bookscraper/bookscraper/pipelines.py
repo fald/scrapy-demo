@@ -77,8 +77,8 @@ class SaveToPostgresPipeline:
         self.cur.execute(
             """
             CREATE TABLE IF NOT EXISTS books (
-                id int NOT NULL SERIAL PRIMARY KEY,
-                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                id SERIAL PRIMARY KEY,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 url VARCHAR(255),
                 title text,
                 product_type VARCHAR(255),
@@ -86,11 +86,62 @@ class SaveToPostgresPipeline:
                 price_excl_tax DECIMAL,
                 price_incl_tax DECIMAL,
                 tax DECIMAL,
-                availability VARCHAR(255),
+                availability int,
                 num_reviews int,
                 star_rating int,
                 category VARCHAR(255),
-                description text,
+                description text
             );
             """
         )
+        
+    def process_item(self, item, spider):
+        self.cur.execute(
+            """
+            INSERT INTO books (
+                url,
+                title,
+                product_type,
+                price,
+                price_incl_tax,
+                price_excl_tax,
+                tax,
+                availability,
+                num_reviews,
+                star_rating,
+                category, 
+                description
+            ) VALUES (
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s
+            )
+            """,
+            (
+                item['url'],
+                item['title'],
+                item['product_type'],
+                item['price'],
+                item['price_incl_tax'],
+                item['price_excl_tax'],
+                item['tax'],
+                item['availability'],
+                item['num_reviews'],
+                item['star_rating'],
+                item['category'],
+                item['description']
+            )
+        )
+        
+    def close_spider(self, spider):
+        self.cur.close()
+        self.conn.close()
