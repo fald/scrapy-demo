@@ -161,3 +161,4 @@ cython_debug/
 
 # Output files that are just being used for testing
 output/
+latest.json
