@@ -16,9 +16,9 @@ FEEDS = {
    "latest.json": {"format": "json"}
 }
 
-
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = "bookscraper (+http://www.yourdomain.com)"
+# USER_AGENT = "bookscraper (+http://www.yourdomain.com)"
+# USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -68,7 +68,7 @@ ROBOTSTXT_OBEY = True
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    "bookscraper.pipelines.BookscraperPipeline": 300,
-   "bookscraper.pipelines.SaveToPostgresPipeline": 400,
+   # "bookscraper.pipelines.SaveToPostgresPipeline": 400,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

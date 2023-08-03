@@ -1,4 +1,5 @@
 import scrapy
+import random
 from bookscraper.items import BookItem
 
 
@@ -6,6 +7,21 @@ class BookspiderSpider(scrapy.Spider):
     name = "bookspider"
     allowed_domains = ["books.toscrape.com"]
     start_urls = ["http://books.toscrape.com/"]
+    
+    custom_settings = {
+        "FEEDS": {
+            "latest.json": {"format": "json", 'overwrite': True}
+        }
+    }
+    
+    # Naturally want these to be distinct in a real application
+    user_agent_list = [
+        "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0",
+        "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0",
+        "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0",
+        "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0",
+        "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0",
+    ]
 
     def parse(self, response):
         books = response.css("article.product_pod")
@@ -25,7 +41,8 @@ class BookspiderSpider(scrapy.Spider):
             else:
                 book_url = "http://books.toscrape.com/catalogue/" + relative_url
             # Not parsing the results pages with these, so we want a separate parser.
-            yield response.follow(book_url, callback=self.parse_book_page)
+            yield response.follow(book_url, callback=self.parse_book_page,
+                                  headers={'User-Agent': random.choice(self.user_agent_list)})
             
         # This takes the next page buttons, follows them with the same parse method,
         # then adds the result to the yielded generator.
@@ -36,7 +53,8 @@ class BookspiderSpider(scrapy.Spider):
                 next_url += next_page
             else:
                 next_url += "catalogue/" + next_page
-            yield response.follow(next_url, callback=self.parse)
+            yield response.follow(next_url, callback=self.parse,
+                                  headers={'User-Agent': random.choice(self.user_agent_list)})
             
     def parse_book_page(self, response):
         table_rows = response.css("table tr")
