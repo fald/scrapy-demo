@@ -126,12 +126,13 @@ class ScrapeOpsFakeUserAgentMiddleware:
             "api_key": self.scrapeops_api_key,
             "num_results": self.scrapeops_num_results
         }
-        response = requests.request(
+        response = requests.get(
             url=self.scrapeops_endpoint,
             params=urlencode(payload)
         )
         json_response = response.json()
-        self.user_agents_list = json_response.get('results', [])
+        self.user_agents_list = json_response.get('result', [])
+        # print("*"*50, "\n"*10, json_response, "\n"*10, "*"*50)
         
     def _get_random_user_agent(self):
         return choice(self.user_agents_list)
@@ -145,3 +146,5 @@ class ScrapeOpsFakeUserAgentMiddleware:
     def process_request(self, request, spider):
         random_user_agent = self._get_random_user_agent()
         request.headers['User-Agent'] = random_user_agent
+        
+        # print("*"*50, "\n"*10, "\nNEW USER AGENT", request.headers["User-Agent"], "\n"*10, "*"*50)
