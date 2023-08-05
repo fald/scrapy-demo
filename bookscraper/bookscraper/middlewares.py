@@ -8,6 +8,10 @@ from scrapy import signals
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
 
+from urllib.parse import urlencode
+from random import choice
+import requests
+
 
 class BookscraperSpiderMiddleware:
     # Not all methods need to be defined. If a method is not defined,
@@ -101,3 +105,18 @@ class BookscraperDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info("Spider opened: %s" % spider.name)
+
+
+class ScrapeOpsFakeUserAgentMiddleware:
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler.settings)
+    
+    def __init__(self, settings):
+        self.scrapeops_api_key = settings.get("SCRAPEOPS_API_KEY")
+        self.scrapeops_endpoint = settings.get("SCRAPEOPS_FAKE_USER_AGENT_ENDPOINT", "https://headers.scrapeops.io/v1/user-agents")
+        self.scrapeops_fake_user_agents_active = settings.get("SCRAPEOPS_FAKE_USER_AGENTS_ACTIVE", False)
+        self.scrapeops_num_results = settings.get("SCRAPEOPS_NUM_RESULTS")
+        self.headers_list = []
+        self._get_user_agents_list()
+        self._scrapeops_fake_user_agents_enabled()

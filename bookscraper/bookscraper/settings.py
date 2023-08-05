@@ -16,6 +16,11 @@ FEEDS = {
    "latest.json": {"format": "json"}
 }
 
+SCRAPEOPS_API_KEY = '9f5f165a-7b2f-49e0-8681-572016a819b1'
+SCRAPEOPS_FAKE_USER_AGENT_ENDPOINT = 'https://headers.scrapeops.io/v1/user-agents'
+SCRAPEOPS_FAKE_USER_AGENTS_ACTIVE = True
+SCRAPEOPS_NUM_RESULTS = 50
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = "bookscraper (+http://www.yourdomain.com)"
 # USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0"
