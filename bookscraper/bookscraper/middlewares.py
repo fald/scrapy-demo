@@ -116,7 +116,32 @@ class ScrapeOpsFakeUserAgentMiddleware:
         self.scrapeops_api_key = settings.get("SCRAPEOPS_API_KEY")
         self.scrapeops_endpoint = settings.get("SCRAPEOPS_FAKE_USER_AGENT_ENDPOINT", "https://headers.scrapeops.io/v1/user-agents")
         self.scrapeops_fake_user_agents_active = settings.get("SCRAPEOPS_FAKE_USER_AGENTS_ACTIVE", False)
-        self.scrapeops_num_results = settings.get("SCRAPEOPS_NUM_RESULTS")
+        self.scrapeops_num_results = settings.get("SCRAPEOPS_NUM_RESULTS", 2) # Low default number
         self.headers_list = []
         self._get_user_agents_list()
         self._scrapeops_fake_user_agents_enabled()
+        
+    def _get_user_agents_list(self):
+        payload =  {
+            "api_key": self.scrapeops_api_key,
+            "num_results": self.scrapeops_num_results
+        }
+        response = requests.request(
+            url=self.scrapeops_endpoint,
+            params=urlencode(payload)
+        )
+        json_response = response.json()
+        self.user_agents_list = json_response.get('results', [])
+        
+    def _get_random_user_agent(self):
+        return choice(self.user_agents_list)
+    
+    def _scrapeops_fake_user_agents_enabled(self):
+        if self.scrapeops_api_key is None or self.scrapeops_api_key == "":
+            self.scrapeops_fake_user_agents_active = False
+        else:
+            self.scrapeops_fake_user_agents_active = True    
+            
+    def process_request(self, request, spider):
+        random_user_agent = self._get_random_user_agent()
+        request.headers['User-Agent'] = random_user_agent
