@@ -148,3 +148,45 @@ class ScrapeOpsFakeUserAgentMiddleware:
         request.headers['User-Agent'] = random_user_agent
         
         # print("*"*50, "\n"*10, "\nNEW USER AGENT", request.headers["User-Agent"], "\n"*10, "*"*50)
+
+
+class ScrapeOpsFakeBrowserHeaderAgentMiddleware:
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler.settings)
+    
+    def __init__(self, settings):
+        self.scrapeops_api_key = settings.get("SCRAPEOPS_API_KEY")
+        self.scrapeops_endpoint = settings.get("SCRAPEOPS_FAKE_BROWSER_HEADER_ENDPOINT", "https://headers.scrapeops.io/v1/browser-headers")
+        self.scrapeops_fake_user_agents_active = settings.get("SCRAPEOPS_FAKE_BROWSER_HEADERS_ACTIVE", True)
+        self.scrapeops_num_results = settings.get("SCRAPEOPS_NUM_RESULTS", 2) # Low default number
+        self.headers_list = []
+        self._get_headers_list()
+        self._scrapeops_fake_browser_headers_enabled()
+        
+    def _get_headers_list(self):
+        payload = {
+            "api_key": self.scrapeops_api_key,
+            "num_results": self.scrapeops_num_results
+        }
+        response = requests.get(
+            url=self.scrapeops_endpoint,
+            params=urlencode(payload)
+        )
+        json_response = response.json()
+        self.headers_list = json_response.get('result', [])
+        
+    def _get_random_browser_header(self):
+         return choice(self.headers_list)
+    
+    def _scrapeops_fake_browser_headers_enabled(self):
+        if self.scrapeops_api_key is None or self.scrapeops_api_key == "":
+            self.scrapeops_fake_user_agents_active = False
+        else:
+            self.scrapeops_fake_user_agents_active = True
+            
+    def process_request(self, request, spider):
+        random_header = self._get_random_browser_header()
+        # This is a doozy
+        # print("*"*50, "\n"*10, "\nNEW BROWSER HEADER", random_header, "\n"*10, "*"*50)
+        request.headers.update(random_header)
