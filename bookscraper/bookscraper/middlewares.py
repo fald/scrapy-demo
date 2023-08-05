@@ -11,6 +11,7 @@ from itemadapter import is_item, ItemAdapter
 from urllib.parse import urlencode
 from random import choice
 import requests
+import base64
 
 
 class BookscraperSpiderMiddleware:
@@ -190,3 +191,21 @@ class ScrapeOpsFakeBrowserHeaderAgentMiddleware:
         # This is a doozy
         # print("*"*50, "\n"*10, "\nNEW BROWSER HEADER", random_header, "\n"*10, "*"*50)
         request.headers.update(random_header)
+
+
+class MyProxyMiddleware(object):
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler.settings)
+    
+    def __init__(self, settings):
+        self.user = settings.get("PROXY_USER")
+        self.password = settings.get("PROXY_PASSWORD")
+        self.endpoint = settings.get("PROXY_ENDPOINT")
+        self.port = settings.get("PROXY_PORT")
+    
+    def process_request(self, request, spider):
+        user_credentials = f"{self.user}:{self.password}"
+        basic_authorization = "Basic " + base64.b64encode(user_credentials.encode()).decode()
+        request.headers['Proxy-Authorization'] = basic_authorization
+        request.meta['proxy'] = f"http://{self.endpoint}:{self.port}"
